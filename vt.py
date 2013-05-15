@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Written by Jeremy 'germ' Galloway
+#Written by Jeremy 'germ' Galloway JeremyNGalloway@gmail.com
 #This module submits a user-defined URL to the VirusTotal scanning engine, and displays the results
 import simplejson
 import urllib
@@ -8,16 +8,16 @@ import re
 from time import sleep 
 target = raw_input('Target domain to scan -->') #get the target domain to scan from the user's keyboard
 url = "https://www.virustotal.com/vtapi/v2/url/scan" #vt submission url
-apikey = "YourApiKeyHere" 
+apikey = "e69de8b2810ba97e16020c1480172c804187b3c57dcdcf017b87501cf590b232" 
 parameters = {"url": target,
               "apikey": apikey }
 data = urllib.urlencode(parameters)
 req = urllib2.Request(url, data)
 try:                                 #if the user cannot contact vt, an exception will be raised
-	response = urllib2.urlopen(req)
+  response = urllib2.urlopen(req)
 except:
-	print "URL submission failed"
-	exit()
+  print "URL submission failed"
+  exit()
 json = response.read()  #response from vt
 
 if re.search(r'Scan request successfully queued', json): #if submission succeeds or fails, let the user know
@@ -49,19 +49,19 @@ while re.search(r'queued', response_dict.get('verbose_msg')): #check the respons
   	print "URL submission failed"
   	
 print "Permalink: " + response_dict.get('permalink') + "\n"  #printing info about response
-print "Scan date: " + response_dict.get('scan_date') + "\n"  #printing info about response
+print "Scan date: " + response_dict.get('scan_date') + " (re-run if results are stale) \n"  #printing info about response
 
 results = response_dict.get('scans') #make dictionary for the scan results
 
 for key, value in results.iteritems(): #print the scan results with formatted output
-    print str(key).ljust(22) + '*',
-    if hasattr(value, 'items'):
-        for subkey, subvalue in value.items():
-            print str(subkey).capitalize()+":", str(subvalue).capitalize()+"  ",
-        else:
-            print
+  print str(key).ljust(22) + '*',
+  if hasattr(value, 'items'): #parsing through the nested dictionary
+    for subkey, subvalue in value.items():
+      print str(subkey).capitalize()+":", str(subvalue).capitalize()+"  ",
     else:
-        print str(value)
+      print
+  else:
+      print str(value)
       
 print "\n" + str(response_dict.get('positives')) + " positives out of " + str(response_dict.get('total')) + " total. \n" #printing info about response
 
