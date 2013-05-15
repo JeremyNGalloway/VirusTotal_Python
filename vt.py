@@ -1,5 +1,6 @@
-#/usr/bin/python
+#!/usr/bin/python
 #Written by Jeremy 'germ' Galloway
+#This module submits a user-defined URL to the VirusTotal scanning engine, and displays the results
 import simplejson
 import urllib
 import urllib2
