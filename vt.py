@@ -1,24 +1,26 @@
 #!/usr/bin/python
 #Written by Jeremy 'germ' Galloway JeremyNGalloway@gmail.com
 #This module submits a user-defined URL to the VirusTotal scanning engine, and displays the results
+import sys
 import simplejson
 import urllib
 import urllib2
 import re
 from time import sleep 
-target = raw_input('Target domain to scan -->') #get the target domain to scan from the user's keyboard
+
+if len(sys.argv) <= 1:  #get the target domain to scan
+  target = raw_input('Target domain to scan -->')  
+else: target = sys.argv[1]
+
 url = "https://www.virustotal.com/vtapi/v2/url/scan" #vt submission url
-apikey = "e69de8b2810ba97e16020c1480172c804187b3c57dcdcf017b87501cf590b232" 
+apikey = "your VT api key here" 
 parameters = {"url": target,
               "apikey": apikey }
 data = urllib.urlencode(parameters)
 req = urllib2.Request(url, data)
-try:                                 #if the user cannot contact vt, an exception will be raised
-  response = urllib2.urlopen(req)
-except:
-  print "URL submission failed"
-  exit()
+response = urllib2.urlopen(req)
 json = response.read()  #response from vt
+
 
 if re.search(r'Scan request successfully queued', json): #if submission succeeds or fails, let the user know
   print "Scan request successfully queued... \n"
@@ -38,15 +40,15 @@ json = response.read()
 response_dict = simplejson.loads(json) #add the response to a dict that we can parse through
 
 while re.search(r'queued', response_dict.get('verbose_msg')): #check the response to see if we're waiting in queue
-  print "Waiting in queue...\n"                               #if so, sleep and then retry
-  sleep(10)
+  print "Waiting in queue...\n"
+  sleep(10)                               #if so, sleep and then retry
   try:
     req = urllib2.Request(url, data)
     response = urllib2.urlopen(req)
     json = response.read()
     response_dict = simplejson.loads(json)
   except:
-  	print "URL submission failed"
+  	print "Error while retrieving report, retrying"
   	
 print "Permalink: " + response_dict.get('permalink') + "\n"  #printing info about response
 print "Scan date: " + response_dict.get('scan_date') + " (re-run if results are stale) \n"  #printing info about response
